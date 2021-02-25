@@ -10,7 +10,7 @@ const ditherImage = (filename) => Jimp.create(filename)
     img.greyscale()
     img.cover(400, 400)
     const basename = path.basename(filename)
-    const outPath = path.join(path.resolve(), '/public/assets/images/')
+    const outPath = path.join(path.resolve(), 'dist/public/assets/images/')
     img.writeAsync(outPath + basename)            // ordered dithering of the image and reduce color space to 16-bits (RGB565)
 })
   .catch(err => {
@@ -19,7 +19,7 @@ const ditherImage = (filename) => Jimp.create(filename)
 
   function ditherAll(){
     const images = []
-    const srcPath = './Images'
+    const srcPath = '../Images'
     fs.readdir(srcPath, (err, files)=>{
 
         if (err) console.log(err)
