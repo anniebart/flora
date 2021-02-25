@@ -72,7 +72,7 @@ const processFile = (filename, template, outPath) =>{
 //putting it all together -> reading, parsing, processing + writing html files from markdown files and saving it to a dist folder. 
 const main = () => {
     const srcPath = path.join(path.resolve(), 'src')
-    const outPath = path.join(path.resolve(), 'site/dist')
+    const outPath = path.join(path.resolve(), 'site')
     const template = readFileSync(
         path.join(srcPath, 'template.html'), 
         'utf8'
@@ -97,7 +97,7 @@ const projects = () =>{
         path.join(srcPath, 'projectsTemplate.html'), 
         'utf8'
         )
-    const outPath = path.join(path.resolve(), 'site/dist')
+    const outPath = path.join(path.resolve(), 'site')
     let str = ''
     links.sort((a, b)=>{
         console.log(a, b)
