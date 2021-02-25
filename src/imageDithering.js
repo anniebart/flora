@@ -23,12 +23,16 @@ const ditherImage = (filename) => Jimp.create(filename)
     fs.readdir(srcPath, (err, files)=>{
 
         if (err) console.log(err)
+        if (files){
+
+        
             for (let file of files){
                 if (file.slice(0, -3) == 'png' || 'jpg'){
                     ditherImage(srcPath +'/'+ file)
                 }
                
             }
+        }
     })
   }
   ditherAll()
