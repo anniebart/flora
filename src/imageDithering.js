@@ -19,7 +19,7 @@ const ditherImage = (filename) => Jimp.create(filename)
 
   function ditherAll(){
     const images = []
-    const srcPath = '../Images'
+    const srcPath = './Images'
     fs.readdir(srcPath, (err, files)=>{
 
         if (err) console.log(err)
