@@ -6,7 +6,9 @@ import matter from 'gray-matter'
 import marked from 'marked'
 import mkdirp from 'mkdirp'
 import glob from 'glob'
-import Jimp from 'jimp'
+import YAML from 'yaml'
+import ditherAll from './imageDithering.js'
+
 
 //links will contain objects with links + titles to all the posts
 const links = []
@@ -19,27 +21,6 @@ const readFile = (filename) =>{
     return {...parsed, html}
 }
 
-//dither + resize image using Jimp
-const ditherImage = (url) => Jimp.create(url)
-  .then(image => {
-    let img = image.clone()
-    img.dither16()
-    const basename = path.basename(url)
-    const outPath = path.join(path.resolve(), '/public/assets/images')
-    img.writeAsync(outPath + basename)            // ordered dithering of the image and reduce color space to 16-bits (RGB565)
-  })
-  .catch(err => {
-    console.log(err)
-  });
-
-const processImages = (img) =>{
-    console.log(img)
-    
-}
-
-
- 
-
 //change the file extension from .md to .html
 const getOutputFilename = (filename, outPath)=>{
     const basename = path.basename(filename)
@@ -47,6 +28,7 @@ const getOutputFilename = (filename, outPath)=>{
     const outfile = path.join(outPath, newFilename)
     return outfile
 }
+
 
 
 const saveFile = (filename, contents) =>{
@@ -77,11 +59,13 @@ const processFile = (filename, template, outPath) =>{
         const parentDir = path.basename(path.dirname(filename))
         
         
-        if (parentDir == 'posts'){
+        if (parentDir == 'projects'){
             const link = path.basename(outFileName)
-            const title = file.data.title
+            const cat = file.data.category
+            let title = file.data.title
+            if (title.length > 35) title = title.slice(0, 35) + '...'
             const date = file.data.date
-            links.push({title: title, date: date, link: link })
+            links.push({title: title, date: date, link: link, cat: cat })
         }
         
         }
@@ -97,43 +81,51 @@ const main = () => {
 
     filenames.forEach((filename) =>{
         processFile(filename, template, outPath)
-    })
-    
-  
-   
-
-    
-    
+    })  
 }
 main();
 
-//make index page template
+//make projects page template
 const makeIndexPage = (template, content) =>
     template
         .replace(/{{content}}/g, content)
-        // .replace(/{{title}}/g, title)
-    
 
 //create index page with links to all pages
-const index = () =>{
+const projects = () =>{
     const srcPath = path.join(path.resolve(), 'src')
     const indexTemplate = readFileSync(
-        path.join(srcPath, 'homeTemplate.html'), 
+        path.join(srcPath, 'projectsTemplate.html'), 
         'utf8'
         )
     const outPath = path.join(path.resolve(), 'dist')
     let str = ''
+    links.sort((a, b)=>{
+        console.log(a, b)
+        if (typeof a.date === String){
+            a.date = parseInt(a.date.split(" ")[0])
+            console.log(a.date)
+        } 
+        if (typeof b.date === String){
+            b.date = parseInt(b.date.split(" ")[0])
+            console.log(b.date)
+        } 
+        if (a.date > b.date) return -1
+        else return 1
+    })
+    
     const list = links.forEach(item=>{
-        str +=`<a href="${item.link}"><li class="postSquare"> <h2>${item.title} </h2> <p>${item.date} </p></li></a>\n`
+        str +=`<a href="${item.link}"><li class="postSquare"> <h6>${item.title}</h6><h6>${item.cat}</h6><h6>${item.date} </h6></li></a>`
     })
 
     const indexPage = makeIndexPage(indexTemplate, str)
-    saveFile(outPath + '/index.html', indexPage)
+    saveFile(outPath + '/projects.html', indexPage)
 }
-index();
+projects();
 
 
-export default {main, index}
+export default {
+    main, projects
+}
 
 
 
